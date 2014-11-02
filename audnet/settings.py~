@@ -43,7 +43,6 @@ INSTALLED_APPS = (
     'posts',
     'bootstrapform',
     'bootstrap3',
-    'listutils',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,8 +80,8 @@ SOCIAL_AUTH_ENABLED_BACKENDS = ('google')
 
 SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'
 
-GOOGLE_OAUTH2_CLIENT_ID      = '762424930158-j7kfk2uf3ka8p5v87s4h1s4dv6opdg6m.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET  = 'TMF9GG83ck4HuqPPyGa7EFRi'
+GOOGLE_OAUTH2_CLIENT_ID      = 'ADD GOOGLE OAUTH CLIENT ID HERE'
+GOOGLE_OAUTH2_CLIENT_SECRET  = 'ADD OAUTH CLIENT SECRET HERE'
 
 LOGIN_URL          = '/login/'
 LOGIN_REDIRECT_URL = '/'
