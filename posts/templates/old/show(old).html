@@ -1,0 +1,95 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+    <title>AUDNET | MY POSTS</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->	
+    <link href="{% static "css/main.css" %}" rel="stylesheet">
+    
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+    
+    <script src="{% static "js/jquery.min.js" %}"></script>
+    <script src="{% static "js/smoothscroll.js" %}"></script>
+    
+
+  </head>
+
+  <body data-spy="scroll" data-offset="0" data-target="#navigation">
+
+    <!-- Fixed navbar -->
+	    <div id="navigation" class="navbar navbar-default navbar-fixed-top">
+	      <div class="container">
+	        <div class="navbar-header">
+	          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	            <span class="icon-bar"></span>
+	            <span class="icon-bar"></span>
+	            <span class="icon-bar"></span>
+	          </button>
+	          <a class="navbar-brand" href="/"><b>AUDNET</b></a>
+	        </div>
+	        <div class="navbar-collapse collapse">
+	          <ul class="nav navbar-nav navbar-right">
+	            <li><a href="/" class="smothscroll">Newsfeed</a></li>
+	            <li class="active"><a href="/user/myposts/" class="smothscroll">My Posts</a></li>
+	            <li><a href="/user/create" class="smothscroll">Create Post</a></li>
+	            <li><a href="/logout" class="smothScroll">Logout</a></li>
+	          </ul>
+	        </div><!--/.nav-collapse -->
+	      </div>
+	    </div>
+
+
+	<section id="home" name="home"></section>
+	<div style="background-color:#34495E;">
+		<div style="text-align:center;"><br>
+			<font color="white" style="font-family:Raleway;" size=30 >{{showuser.username}}</font><br><h3><font color="white"></font></h3><h4><a href="/user/follow/{{showuser.id}}">Follow</a></h4>
+		</div>
+	</div><!--/ #headerwrap -->
+
+
+	<section id="desc" name="desc"></section>
+	
+	<!-- FEATURES WRAP -->
+	<div id="features">
+		<div class="container">
+			<div class="row">
+				<br>
+				<br>
+				{% for post in posts %}
+				<div style="margin:0 auto; text-align:center; width:650px"><h3>
+		                       <hr><br><h2><a href="/user/post/{{ post.id }}/">{{ post.title }}</a></h2><br><h3>{{ post.body }}<br>{% if post.thumbnail %}
+		                       <p><img src="/static/{{post.thumbnail}}" width="200px" height="200px"></p><br>
+		                       {% endif %}</h3><br><font size="3">-{{ post.user }}</font><br>
+		                       <br><p>{{post.likes}} people like this post</p>
+		                       Comments:
+		                       <br><br>
+                   				{% for com in comment %}
+                   				{% if com.pid == post.id %}{{com.body}} - {{com.user}} - {{com.pub_date}}<br>{% endif %}
+                   				{% endfor %}
+                   				<br><br><a href="/user/delete/{{post.id}}">Delete Post</a><br>
+
+				</h3>{% endfor %}<hr></div>
+			</div>
+		</div><!--/ .container -->
+	</div><!--/ #features -->
+	
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static "js/bootstrap.js" %}"></script>
+	<script>
+	$('.carousel').carousel({
+	  interval: 3500
+	})
+	</script>
+  </body>
+</html>

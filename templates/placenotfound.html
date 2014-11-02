@@ -1,0 +1,233 @@
+{% load staticfiles %}
+{% load bootstrap %}
+{% load bootstrap3 %}
+<!DOCTYPE html>
+<html lang="en-EN"><head>
+   
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<title>Geo-Con</title> 
+
+<link rel="stylesheet" href="{% static "css/style.css" %}" media="screen">
+    <link href="{% static "css/main.css" %}" rel="stylesheet">
+
+<!--[if IE 8]>
+    <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'>
+	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="http://demo.themeinprogress.com/nova/wp-content/themes/nova/scripts/selectivizr-min.js" type="text/javascript"></script>
+<![endif]-->
+<link rel="stylesheet" id="Custom-css" href="{% static "css/turquoise.css" %}" type="text/css" media="all">
+<link href="{% static "css/css.css" %}" rel="stylesheet" type="text/css">
+
+<link rel="stylesheet" id="bootstrap.min-css" href="{% static "css/bootstrap_002.css" %}" type="text/css" media="all">
+<link rel="stylesheet" id="bootstrap.min.responsive-css" href="{% static "css/bootstrap.css" %}" type="text/css" media="all">
+<link rel="stylesheet" id="flexslider-css" href="{% static "css/flexslider.css" %}" type="text/css" media="all">
+<link rel="stylesheet" id="font-awesome.min-css" href="{% static "css/font-awesome.css" %}" type="text/css" media="all">
+<link rel="stylesheet" id="nivoslider-css" href="{% static "css/nivoslider.css" %}" type="text/css" media="all">
+<link rel="stylesheet" id="prettyPhoto-css" href="{% static "css/prettyPhoto.css" %}" type="text/css" media="all">
+<link rel="stylesheet" href="http://js.arcgis.com/3.11/dijit/themes/claro/claro.css">
+<link rel="stylesheet" href="http://js.arcgis.com/3.11/esri/css/esri.css">
+
+<script type="text/javascript" src="Nova%20-%20Another%20creative%20Wordpress%20theme._files/comment-reply.js"></script>
+<script type="text/javascript" src="{% static "js/jquery_006.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery-migrate.js" %}"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+
+    <script src="http://js.arcgis.com/3.11/"></script>
+    <script>
+      var map, locator;
+
+      require([
+        "esri/map", "esri/tasks/locator", "esri/graphic",
+        "esri/InfoTemplate", "esri/symbols/SimpleMarkerSymbol",
+        "esri/symbols/Font", "esri/symbols/TextSymbol",
+        "dojo/_base/array", "esri/Color",
+        "dojo/number", "dojo/parser", "dojo/dom", "dijit/registry",
+
+        "dijit/form/Button", "dijit/form/Textarea",
+        "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/domReady!"
+      ], function(
+        Map, Locator, Graphic,
+        InfoTemplate, SimpleMarkerSymbol, 
+        Font, TextSymbol,
+        arrayUtils, Color,
+        number, parser, dom, registry
+      ) {
+        parser.parse();
+
+        map = new Map("map", { 
+          basemap: "streets",
+          center: [-93.5, 41.431],
+          zoom: 5
+        });
+        
+        locator = new Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+        locator.on("address-to-locations-complete", showResults);
+
+        // listen for button click then geocode
+        registry.byId("locate").on("click", locate);
+        
+        map.infoWindow.resize(200,125);
+
+        function locate() {
+          map.graphics.clear();
+          var address = {
+            "SingleLine": "{{place.destination}}"
+          };
+          locator.outSpatialReference = map.spatialReference;
+          var options = {
+            address: address,
+            outFields: ["Loc_name"]
+          };
+          locator.addressToLocations(options);
+        }
+
+        function showResults(evt) {
+          var symbol = new SimpleMarkerSymbol();
+          var infoTemplate = new InfoTemplate(
+            "Location", 
+            "Address: ${address}<br />Score: ${score}<br />Source locator: ${locatorName}"
+          );
+          symbol.setStyle(SimpleMarkerSymbol.STYLE_SQUARE);
+          symbol.setColor(new Color([153,0,51,0.75]));
+
+          var geom;
+          arrayUtils.every(evt.addresses, function(candidate) {
+            console.log(candidate.score);
+            if (candidate.score > 80) {
+              console.log(candidate.location);
+              var attributes = { 
+                address: candidate.address, 
+                score: candidate.score, 
+                locatorName: candidate.attributes.Loc_name 
+              };   
+              geom = candidate.location;
+              var graphic = new Graphic(geom, symbol, attributes, infoTemplate);
+              //add a graphic to the map at the geocoded location
+              map.graphics.add(graphic);
+              //add a text symbol to the map listing the location of the matched address.
+              var displayText = candidate.address;
+              var font = new Font(
+                "16pt",
+                Font.STYLE_NORMAL, 
+                Font.VARIANT_NORMAL,
+                Font.WEIGHT_BOLD,
+                "Helvetica"
+              );
+             
+              var textSymbol = new TextSymbol(
+                displayText,
+                font,
+                new Color("#666633")
+              );
+              textSymbol.setOffset(0,8);
+              map.graphics.add(new Graphic(geom, textSymbol));
+              return false; //break out of loop after one candidate with score greater  than 80 is found.
+            }
+          });
+          if ( geom !== undefined ) {
+            map.centerAndZoom(geom, 12);
+          }
+        }
+      });
+    </script>
+
+<style type="text/css" id="customstyle">
+   
+
+body { background: url(http://demo.themeinprogress.com/nova/wp-content/themes/nova/images/background/patterns/pattern12.jpg);background-repeat:repeat;background-color:#f3f3f3;background-attachment:normal; } #header, nav#mainmenu ul ul { background-color: #262626; } nav#mainmenu ul ul { border-top-color: #262626; } #subheader { background-color: #212121; } #header, nav#mainmenu ul ul li a, #subheader { border-color: #333333; } nav#mainmenu ul ul { border-left-color: #333333; border-right-color: #333333; border-bottom-color: #333333; } .bottom_widget { background-color: #262626; } .bottom_socials { background-color: #212121; } #footer { background-color: #262626; } #footer, .bottom_socials, .bottom_widget, .bottom_widget ul.contact-info li, .bottom_widget .widget-box li { border-color: #333333; } #logo a { font-family:'Montez',Verdana, Geneva, sans-serif;font-size:55px; } nav#mainmenu ul li a, nav#mainmenu ul ul li a { font-family:'Oxygen',Verdana, Geneva, sans-serif;font-size:14px; } .article p, .article li, .article address, .article dd, .article blockquote, .article td, .article th, #searchform input[type=text], #searchform textarea, .contact-form input[type=text], .contact-form textarea, .comment-form input[type=text], .comment-form textarea, #searchform input[type=submit], .contact-form input[type=submit], .comment-form input[type=submit], .entry-tags, .entry-info, .widget-category li a, #wp-calendar th, #wp-calendar #today, #wp-calendar #today a, #wp-calendar caption, ul#twitter_update_list li, .tagcloud a, .tabs-container p, .tabs li a, .toggle, .toggle_container h5.element, .wp-pagenavi a, .wp-pagenavi a:link, .wp-pagenavi span.current, p, li, address, dd, blockquote, td, th, .textwidget, .button, .btn, .bottom a, .bottom p, .bottom li, .bottom address, .bottom dd, .bottom blockquote, .bottom td, .bottom th, .bottom .textwidget, #footer a, #footer p, #footer li, #footer address, #footer dd, #footer blockquote, #footer td, #footer th, #footer .textwidget, #sidebar p, #sidebar li, #sidebar address, #sidebar dd, #sidebar blockquote, #sidebar td, #sidebar th, #sidebar .textwidget, .article-header,.skills .views, .filter li a, .filterable-grid .overlay, .comment-container, .pin-article .aside p{ font-family:'Oxygen',Verdana, Geneva, sans-serif;}.article p, .article li, .article address, .article dd, .article blockquote, .article td, .article th { font-size:14px}h1.title, h2.title, h3.title, h4.title, h5.title, h6.title, h1, h2, h3, h4, h5, h6, #subheader p, #subheader h1, h3#reply-title, h3.comments,.pin-article .link a, .pin-article .quote p { font-family:'Yanone Kaffeesatz',Verdana, Geneva, sans-serif; } h1 {font-size:28px; }h2 { font-size:26px; }h3 { font-size:24px; }h4 { font-size:21px; }h5 { font-size:18px; }h6 { font-size:16px; }::-moz-selection { background-color: #48c9b0; } ::selection { background-color: #48c9b0; } article blockquote { border-left-color: #48c9b0; } #back-to-top a:hover, body.light #back-to-top a:hover, nav#widgetmenu li a:hover, nav#widgetmenu li:hover > a , nav#widgetmenu li.current-menu-item > a, nav#widgetmenu li.current-menu-ancestor > a, .pin-article .link a:hover, .pin-article .quote:hover, .skills .views.active, .skills .views:hover, .filter li:hover, .filter li.active, #searchform input[type=submit]:hover, .contact-form input[type=submit]:hover, .comment-form input[type=submit]:hover, .widget-category li a:hover, .tagcloud a:hover, .tabs li a:hover, .tabs li.ui-tabs-active a, .tabs li.ui-state-active a, .socials a:hover,.button:hover, .wp-pagenavi a:hover, .wp-pagenavi span.current, #wp-calendar #today, #wp-calendar #today a { background-color: #1abc9c; } #sidebar a:hover, .bottom a:hover, #footer a:hover, #logo a:hover, nav#mainmenu ul li a:hover, nav#mainmenu li:hover > a, nav#mainmenu ul li.current-menu-item > a,  nav#mainmenu ul li.current_page_item > a, nav#mainmenu ul li.current-menu-parent > a, nav#mainmenu ul li.current_page_ancestor > a, nav#mainmenu ul li.current-menu-ancestor > a, .pin-article h1.title a:hover, .filterable-grid  h4.title a:hover, .filterable-grid  h4.title a:focus, .entry-info a:hover { color: #1abc9c; } #back-to-top a:hover, nav#widgetmenu li a:hover, nav#widgetmenu li:hover > a , nav#widgetmenu li.current-menu-item > a, nav#widgetmenu li.current-menu-ancestor > a, .widget-category li a:hover, .toggle_container h5.element:hover, .toggle_container h5.inactive, .toggle_container h5.inactive:hover, .toggle_container h5.element:hover:last-of-type, .toggle_container h5.inactive:last-of-type, .toggle_container h5.inactive:hover:last-of-type  { border-color: #1abc9c; } #logo a, nav#mainmenu ul li a, nav#mainmenu ul ul li a { color: #ffffff; } #subheader, #subheader p, #subheader h1, #subheader p a, #subheader h1 a { color: #ffffff; } .bottom_widget a, .bottom_widget h3, .bottom_widget label, .bottom_widget caption, .bottom_widget p, .bottom_widget li, .bottom_widget address, .bottom_widget dd, .bottom_widget blockquote, .bottom_widget td, .bottom_widget th, .bottom_widget .textwidget { color: #ffffff; } #footer a, #footer p, #footer li, #footer address, #footer dd, #footer blockquote, #footer td, #footer th, #footer .textwidget  { color: #ffffff; } .bottom_socials a { color: #333333; } .bottom_socials a:hover { color: #ffffff; } 
+</style>
+    
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+</head>
+
+<body class="home page page-id-2653 page-template page-template-masonry-two-columns-sidebar-php" onload = "document.getElementById('locate').click();">
+
+<header id="header">
+
+    <div class="container">
+        <div class="row">
+            
+            <div class="span3">
+               
+                <div id="logo">
+                        
+                    <a href="#">
+                            
+                      &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  Geo-Con                              
+                    </a>
+                            
+                </div>
+    		</div><div>
+
+            <div class="span9">
+              
+                <nav id="mainmenu">
+                    <ul id="menu-main-menu" class="menu l_tinynav1"><li id="menu-item-2580" class="menu-item menu-item-type-custom menu-item-object-custom   menu-item-home menu-item-has-children menu-item-2580"><a href="/"><br>Newsfeed</a>
+                        <li id="menu-item-2581" class="menu-item menu-item-type-taxonomy menu-item-object-category current-menu-item menu-item-2581"><a href="/user/lookitup"><br>Look it up</a></li>
+</li>
+<li id="menu-item-2581" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2581"><a href="/user/myposts"><br>My Posts</a></li>
+<li id="menu-item-2583" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2583"><a href="/user/create"><br>Create Post</a>
+</li>
+<li id="menu-item-2582" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2582"><a href="/logout"><br>Logout</a>
+</li>
+</ul>
+</nav> 
+                               
+            </div>
+            
+        </div>
+    </div>
+
+</header>
+<!--<section id="subheader">
+	<div class="container">
+            	<p> Newsfeed</p>
+
+    </div>
+</section>-->
+
+
+ 
+<div style="text-align:center;">
+    <br><br><font size="30">Place not found in database</font><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+
+
+    
+<footer id="footer">
+    <div class="container" style="text-align:center;">
+
+<br><br>
+
+<p> Geo-Con</a></p><p>Made by : Lohitaksh Parmar,Nalin Gupta,Kushagra Singh
+                         
+<br><br>        
+    </div>
+</footer>
+    
+
+    
+
+<script type="text/javascript" src="{% static "js/jquery_007.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_009.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_008.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_0012.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_010.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_011.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_003.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_013.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_002.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_005.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery_004.js" %}"></script>
+
+    <script src="{% static "js/bootstrap.js" %}"></script>
+
+
+</body></html>
