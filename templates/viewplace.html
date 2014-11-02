@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 
-<title>Post it up!</title> 
+<title>Geo-Con</title> 
 
 <link rel="stylesheet" href="{% static "css/style.css" %}" media="screen">
     <link href="{% static "css/main.css" %}" rel="stylesheet">
@@ -382,7 +382,10 @@ $container.imagesLoaded(function(){
     <div style="display:block; height:200px; padding:15px; width:800px; margin-left:18%; margin-top:5%; margin-bottom:5%; background-color:white;">
       <div class = "row">
       {% for image1 in imagearr %}
-        <img style = 'margin-left:20px' src = 'http://127.0.0.1:8000/static/{{image1.picture.url}}' height=135 width = 115 >{% endfor %}
+        {% if image1.picture %}
+        <img style = 'margin-left:20px' src = 'http://127.0.0.1:8000/static/{{image1.picture.url}}' height=135 width = 115 >
+        {% endif %}
+        {% endfor %}
     </div>
     </div>
 

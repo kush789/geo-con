@@ -14,6 +14,12 @@ class Post(models.Model):
 	user = models.ForeignKey(User, null=True, blank=True)
 	likes = models.IntegerField(default=0)
 	thumbnail = models.FileField(upload_to=get_upload_file_name, blank=True, null=True)
+	food = models.CharField(max_length = "20",blank=True,default = " ")
+	language = models.CharField(max_length = "20",blank = True,default = " ")
+	music = models.CharField(max_length = "20",blank = True,default = " ")
+	placetovisit = models.CharField(max_length = "20",blank = True,default = " ")
+
+
 
 	def __unicode__(self):
 		return self.title
@@ -31,6 +37,30 @@ class Comment(models.Model):
 	def __unicode__(self):
 		return self.body
 	
+
+
+class place(models.Model):
+	destination = models.CharField(max_length = 50, default = " ")
+
+class placetovisit(models.Model):
+	destination = models.ForeignKey(place)
+	place = models.CharField(max_length = "30", default = " ")
+
+class food(models.Model):
+	destination = models.ForeignKey(place)
+	food = models.CharField(max_length = "30", default = " ")
+
+class language(models.Model):
+	destination = models.ForeignKey(place)
+	language = models.CharField(max_length = "30", default = " ")
+
+class music(models.Model):
+	destination = models.ForeignKey(place)
+	music = models.CharField(max_length = "30", default = " ")
+
+class image(models.Model):
+	destination = models.ForeignKey(place)
+	picture = models.FileField(null = True)
 
 class Like(models.Model):
 	post = models.ForeignKey(Post)

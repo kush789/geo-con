@@ -15,6 +15,5 @@ class Migration(migrations.Migration):
             model_name='place',
             name='destination',
             field=models.CharField(default=b' ', max_length=50),
-            preserve_default=True,
         ),
     ]

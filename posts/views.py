@@ -103,6 +103,7 @@ def create(request):
 			f2 = form.save(commit=False)
 			f2.pub_date = datetime.datetime.now()
 			f2.user = request.user
+			f2.title=f2.title.lower()
 			f2.save()
 			try:
 				place.objects.get(destination = request.POST['title'].lower())
@@ -112,19 +113,19 @@ def create(request):
 				newdest.save()
 				print newdest.destination
 
-			newplace = placetovisit(destination = place.objects.get(destination = request.POST['title']),place = request.POST['placetovisit'])
+			newplace = placetovisit(destination = place.objects.get(destination = request.POST['title'].lower()),place = request.POST['placetovisit'])
 			newplace.save()
 
-			newplace = food(destination = place.objects.get(destination = request.POST['title']),food = request.POST['food'])
+			newplace = food(destination = place.objects.get(destination = request.POST['title'].lower()),food = request.POST['food'])
 			newplace.save()
 
-			newplace = language(destination = place.objects.get(destination = request.POST['title']),language = request.POST['language'])
+			newplace = language(destination = place.objects.get(destination = request.POST['title'].lower()),language = request.POST['language'])
 			newplace.save()
 
-			newplace = music(destination = place.objects.get(destination = request.POST['title']),music = request.POST['music'])
+			newplace = music(destination = place.objects.get(destination = request.POST['title'].lower()),music = request.POST['music'])
 			newplace.save()
 
-			newplace = image(destination = place.objects.get(destination = request.POST['title']),picture = f2.thumbnail)
+			newplace = image(destination = place.objects.get(destination = request.POST['title'].lower()),picture = f2.thumbnail)
 			newplace.save()
 
 
@@ -166,8 +167,8 @@ def viewplace(request,place_id=1):
 		currmusic = music.objects.filter(destination = currplace)
 		currimage = image.objects.filter(destination = currplace)
 		placetovisitarr = placetovisit.objects.filter(destination = currplace)
-		for i in currimage:
-			print i
+		for i in food.objects.all():
+			print i.destination
 		return render_to_response('viewplace.html', {'place':currplace,'placetovisitarr':placetovisitarr,'imagearr':currimage,'foodarr':currfood,'musicarr':currmusic,'languagearr':currlanguage})
 	else:
 		args = {}

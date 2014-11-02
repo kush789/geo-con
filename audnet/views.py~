@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.contrib.auth import logout as auth_logout
-from posts.views import posts
+from posts.views import *
 from django.contrib import auth
 from forms import MyRegistrationForm
 

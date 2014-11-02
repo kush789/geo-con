@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.shortcuts import render_to_response
 from posts.models import *
 from django.template import RequestContext
@@ -25,10 +25,30 @@ def posts(request):
 		return render_to_response('loggedin.html', args )
 	else:
 		args = {}
-		args.update(csrf(request))
 		args.update(csrf(request)) 
 		args['error'] = '**PLEASE SIGN IN FIRST**'
 		return render_to_response('index.html', args)
+
+
+def lookitup(request):
+	if request.user.is_authenticated():
+		args = {}
+		args.update(csrf(request)) 
+		if request.method == "POST":
+			name = request.POST['uniqueplace'].lower()
+			try:
+				theplace = place.objects.get(destination = name)
+				place_id = theplace.id
+				return redirect ('/user/viewplace/'+str(place_id))
+			except:
+				return render_to_response ('placenotfound.html',args)
+		return render_to_response('lookitup.html',args)
+	else:
+		args = {}
+		args.update(csrf(request)) 
+		args['error'] = '**PLEASE SIGN IN FIRST**'
+		return render_to_response('index.html', args)
+
 
 def post(request,post_id=1):
 	if request.user.is_authenticated():
@@ -83,7 +103,32 @@ def create(request):
 			f2 = form.save(commit=False)
 			f2.pub_date = datetime.datetime.now()
 			f2.user = request.user
-		        f2.save()
+			f2.title=f2.title.lower()
+			f2.save()
+			try:
+				place.objects.get(destination = request.POST['title'].lower())
+				print "found"
+			except:
+				newdest = place(destination = request.POST['title'].lower())
+				newdest.save()
+				print newdest.destination
+
+			newplace = placetovisit(destination = place.objects.get(destination = request.POST['title'].lower()),place = request.POST['placetovisit'])
+			newplace.save()
+
+			newplace = food(destination = place.objects.get(destination = request.POST['title'].lower()),food = request.POST['food'])
+			newplace.save()
+
+			newplace = language(destination = place.objects.get(destination = request.POST['title'].lower()),language = request.POST['language'])
+			newplace.save()
+
+			newplace = music(destination = place.objects.get(destination = request.POST['title'].lower()),music = request.POST['music'])
+			newplace.save()
+
+			newplace = image(destination = place.objects.get(destination = request.POST['title'].lower()),picture = f2.thumbnail)
+			newplace.save()
+
+
 			return myposts(request)
 	else:
 		form = PostForm()
@@ -111,6 +156,25 @@ def like_post(request,post_id=1):
 		args['error'] = '**PLEASE SIGN IN FIRST**'
 		return render_to_response('index.html', args)
 
+
+
+def viewplace(request,place_id=1):
+	if request.user.is_authenticated():
+		currplace = place.objects.get(id=place_id
+		currfood = food.objects.filter(destination = currplace)
+		currmusic = music.objects.filter(destination = currplace)
+		currlanguage = language.objects.filter(destination = currplace)
+		currmusic = music.objects.filter(destination = currplace)
+		currimage = image.objects.filter(destination = currplace)
+		placetovisitarr = placetovisit.objects.filter(destination = currplace)
+		for i in food.objects.all():
+			print i.destination
+		return render_to_response('viewplace.html', {'place':currplace,'placetovisitarr':placetovisitarr,'imagearr':currimage,'foodarr':currfood,'musicarr':currmusic,'languagearr':currlanguage})
+	else:
+		args = {}
+		args.update(csrf(request)) 
+		args['error'] = '**PLEASE SIGN IN FIRST**'
+		return render_to_response('index.html', args)
 
 def delete_post(request,post_id=1):
 	if request.user.is_authenticated():

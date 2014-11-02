@@ -60,7 +60,7 @@ class music(models.Model):
 
 class image(models.Model):
 	destination = models.ForeignKey(place)
-	picture = models.FileField(null = True)
+	picture = models.FileField(null = True, blank=True)
 
 class Like(models.Model):
 	post = models.ForeignKey(Post)
